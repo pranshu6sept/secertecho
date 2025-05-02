@@ -17,7 +17,7 @@ const registerSchema = z.object({
   password: z.string().min(6, 'Password must be at least 6 characters'),
   confirmPassword: z.string().min(6, 'Confirm password must be at least 6 characters'),
 }).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don&apos;t match",
+  message: "Passwords don't match",
   path: ['confirmPassword'],
 });
 
@@ -83,69 +83,49 @@ export default function RegisterPage() {
 
           <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
             <div className="space-y-4">
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FaUser className="h-5 w-5 text-gray-400" />
-                </div>
-                <Input
-                  id="username"
-                  label="Username"
-                  type="text"
-                  autoComplete="username"
-                  required
-                  className="pl-10"
-                  error={errors.username?.message}
-                  {...register('username')}
-                />
-              </div>
+              <Input
+                id="username"
+                label="Username"
+                type="text"
+                autoComplete="username"
+                required
+                icon={<FaUser className="h-5 w-5 text-gray-400" />}
+                error={errors.username?.message}
+                {...register('username')}
+              />
 
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FaEnvelope className="h-5 w-5 text-gray-400" />
-                </div>
-                <Input
-                  id="email"
-                  label="Email address"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  className="pl-10"
-                  error={errors.email?.message}
-                  {...register('email')}
-                />
-              </div>
+              <Input
+                id="email"
+                label="Email address"
+                type="email"
+                autoComplete="email"
+                required
+                icon={<FaEnvelope className="h-5 w-5 text-gray-400" />}
+                error={errors.email?.message}
+                {...register('email')}
+              />
 
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FaLock className="h-5 w-5 text-gray-400" />
-                </div>
-                <Input
-                  id="password"
-                  label="Password"
-                  type="password"
-                  autoComplete="new-password"
-                  required
-                  className="pl-10"
-                  error={errors.password?.message}
-                  {...register('password')}
-                />
-              </div>
+              <Input
+                id="password"
+                label="Password"
+                type="password"
+                autoComplete="new-password"
+                required
+                icon={<FaLock className="h-5 w-5 text-gray-400" />}
+                error={errors.password?.message}
+                {...register('password')}
+              />
 
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FaLock className="h-5 w-5 text-gray-400" />
-                </div>
-                <Input
-                  id="confirmPassword"
-                  label="Confirm Password"
-                  type="password"
-                  autoComplete="new-password"
-                  required
-                  className="pl-10"
-                  error={errors.confirmPassword?.message}
-                  {...register('confirmPassword')}
-                />
-              </div>
+              <Input
+                id="confirmPassword"
+                label="Confirm Password"
+                type="password"
+                autoComplete="new-password"
+                required
+                icon={<FaLock className="h-5 w-5 text-gray-400" />}
+                error={errors.confirmPassword?.message}
+                {...register('confirmPassword')}
+              />
             </div>
 
             <div>

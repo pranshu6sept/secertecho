@@ -25,6 +25,41 @@ type MessageAction =
   | { type: 'SET_AI_RESPONDING'; payload: boolean }
   | { type: 'CLEAR_ERROR' };
 
+// Constants for local storage
+const MESSAGES_CACHE_KEY = 'secretecho_messages';
+const CACHE_EXPIRY_MS = 30 * 60 * 1000; // 30 minutes
+
+// Helper function to check if cache is valid
+const isCacheValid = (timestamp: number) => {
+  return Date.now() - timestamp < CACHE_EXPIRY_MS;
+};
+
+// Helper function to save messages to local storage
+const saveToLocalStorage = (messages: Message[]) => {
+  const data = {
+    messages,
+    timestamp: Date.now()
+  };
+  localStorage.setItem(MESSAGES_CACHE_KEY, JSON.stringify(data));
+};
+
+// Helper function to get messages from local storage
+const getFromLocalStorage = (): { messages: Message[]; timestamp: number } | null => {
+  const data = localStorage.getItem(MESSAGES_CACHE_KEY);
+  if (!data) return null;
+  
+  try {
+    const parsed = JSON.parse(data);
+    if (isCacheValid(parsed.timestamp)) {
+      return parsed;
+    }
+  } catch (error) {
+    console.error('Error parsing cached messages:', error);
+    localStorage.removeItem(MESSAGES_CACHE_KEY);
+  }
+  return null;
+};
+
 // Message reducer
 const messageReducer = (state: MessageState, action: MessageAction): MessageState => {
   switch (action.type) {
@@ -56,6 +91,10 @@ const messageReducer = (state: MessageState, action: MessageAction): MessageStat
         error: action.payload,
       };
     case 'ADD_MESSAGE':
+      // Update local storage when new message is added
+      const updatedMessages = [...state.messages, action.payload];
+      saveToLocalStorage(updatedMessages);
+      
       // Check if message with this ID already exists
       if (state.messages.some(msg => msg._id === action.payload._id)) {
         // Replace the message if it exists (to handle any updates)
@@ -68,21 +107,27 @@ const messageReducer = (state: MessageState, action: MessageAction): MessageStat
       }
       return {
         ...state,
-        messages: [...state.messages, action.payload],
+        messages: updatedMessages,
       };
     case 'DELETE_MESSAGE':
+      // Update local storage when message is deleted
+      const remainingMessages = state.messages.filter((message) => message._id !== action.payload);
+      saveToLocalStorage(remainingMessages);
       return {
         ...state,
-        messages: state.messages.filter((message) => message._id !== action.payload),
+        messages: remainingMessages,
       };
     case 'MARK_AS_READ':
+      // Update local storage when messages are marked as read
+      const updatedReadMessages = state.messages.map((message) => 
+        action.payload.includes(message._id) 
+          ? { ...message, read: true } 
+          : message
+      );
+      saveToLocalStorage(updatedReadMessages);
       return {
         ...state,
-        messages: state.messages.map((message) => 
-          action.payload.includes(message._id) 
-            ? { ...message, read: true } 
-            : message
-        ),
+        messages: updatedReadMessages,
       };
     case 'CLEAR_ERROR':
       return {
@@ -179,12 +224,24 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   // Fetch messages
   const fetchMessages = useCallback(async () => {
-    if (!authState.isAuthenticated) return;
+    dispatch({ type: 'FETCH_MESSAGES_START' });
     
     try {
-      dispatch({ type: 'FETCH_MESSAGES_START' });
+      // Try to get from local storage first
+      const cachedData = getFromLocalStorage();
+      if (cachedData) {
+        dispatch({ type: 'FETCH_MESSAGES_SUCCESS', payload: cachedData.messages });
+        return;
+      }
+
+      // If not in cache, fetch from API
       const response = await messagesApi.getMessages();
-      dispatch({ type: 'FETCH_MESSAGES_SUCCESS', payload: response.data });
+      const messages = response.data;
+      
+      // Save to local storage
+      saveToLocalStorage(messages);
+      
+      dispatch({ type: 'FETCH_MESSAGES_SUCCESS', payload: messages });
     } catch (error) {
       // Type-safe error handling
       const errorMessage = error instanceof Error ? error.message : 
@@ -197,7 +254,7 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({ child
         payload: errorMessage,
       });
     }
-  }, [authState.isAuthenticated]);
+  }, [dispatch]);
 
   // Send message
   const sendMessage = useCallback(async (content: string) => {

@@ -74,37 +74,27 @@ export default function LoginPage() {
 
           <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
             <div className="space-y-4">
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FaEnvelope className="h-5 w-5 text-gray-400" />
-                </div>
-                <Input
-                  id="email"
-                  label="Email address"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  className="pl-10"
-                  error={errors.email?.message}
-                  {...register('email')}
-                />
-              </div>
+              <Input
+                id="email"
+                label="Email address"
+                type="email"
+                autoComplete="email"
+                required
+                icon={<FaEnvelope className="h-5 w-5 text-gray-400" />}
+                error={errors.email?.message}
+                {...register('email')}
+              />
 
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FaLock className="h-5 w-5 text-gray-400" />
-                </div>
-                <Input
-                  id="password"
-                  label="Password"
-                  type="password"
-                  autoComplete="current-password"
-                  required
-                  className="pl-10"
-                  error={errors.password?.message}
-                  {...register('password')}
-                />
-              </div>
+              <Input
+                id="password"
+                label="Password"
+                type="password"
+                autoComplete="current-password"
+                required
+                icon={<FaLock className="h-5 w-5 text-gray-400" />}
+                error={errors.password?.message}
+                {...register('password')}
+              />
             </div>
 
             <div>
