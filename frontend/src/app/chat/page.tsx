@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/hooks/useAuth';
 import { useMessages } from '@/context/MessageContext';
 import { MessageBubble } from '@/components/MessageBubble';
 import { MessageInput } from '@/components/MessageInput';

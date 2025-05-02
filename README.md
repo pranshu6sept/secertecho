@@ -59,7 +59,6 @@ A modern chat application with real-time messaging capabilities featuring an AI 
   - MongoDB with Mongoose
   - Socket.io for real-time communication
   - JWT for authentication
-  - bcrypt for password hashing
 
 - **Frontend**:
   - Next.js 15.3.1

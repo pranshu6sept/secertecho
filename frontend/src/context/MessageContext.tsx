@@ -4,7 +4,7 @@ import React, { createContext, useContext, useReducer, useCallback, useEffect } 
 import { io, Socket } from 'socket.io-client';
 import { Message, MessageState, CreateMessagePayload } from '@/types';
 import { messagesApi } from '@/services/api';
-import { useAuth } from './AuthContext';
+import { useAuth } from '../hooks/useAuth';
 
 // Initial state
 const initialState: MessageState = {
@@ -26,7 +26,7 @@ type MessageAction =
   | { type: 'CLEAR_ERROR' };
 
 // Constants for local storage
-const MESSAGES_CACHE_KEY = 'secretecho_messages';
+export const MESSAGES_CACHE_KEY = 'secretecho_messages';
 const CACHE_EXPIRY_MS = 30 * 60 * 1000; // 30 minutes
 
 // Helper function to check if cache is valid
